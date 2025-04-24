@@ -29,7 +29,7 @@ function create_pdf_content(entries) {
       {
         columns: [
           {
-            text: `${year} ${month} ${day}`,
+            text: `${year} ${month} ${day.toString().padStart(2, '0')}`,
           },
           { text: spans_content,
             style: "items",
@@ -144,7 +144,7 @@ function plain_text(entries) {
     let year = entry.date.getFullYear();
     let month = entry.date.toLocaleString('default', { month: 'long' });
     let day = entry.date.getDate();
-    console.log(`\x1b[34m${year} ${month} ${day}\x1b[0m`
+    console.log(`\x1b[34m${year} ${month} ${day.toString().padStart(2, '0')}\x1b[0m`
       + " \x1b[0m" + spans_content + "\x1b[0m "
       + "\x1b[32m" + Math.round(entry_total * 100)/100 + "\x1b[0m");
 

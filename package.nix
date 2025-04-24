@@ -1,26 +1,61 @@
-{ stdenv, fetchurl }:
+{ python2, libtool, writeShellScript, writeTextFile, runCommand, pkgs, fetchurl, fetchgit, nix-gitignore, lib, stdenv, nodejs, fetchFromGitHub, makeWrapper}:
+
+let
+  nodeEnv = import ./node-env.nix {
+        python2 = python2;
+        libtool = libtool;
+        pkgs = pkgs;
+        runCommand = runCommand;
+        writeTextFile = writeTextFile;
+        writeShellScript = writeShellScript;
+    inherit nodejs;
+    lib = lib;
+    stdenv = stdenv;
+  };
+
+  nodeDependencies = (import ./node-packages.nix {
+        nodeEnv = nodeEnv;
+    lib = lib;
+    stdenv = stdenv;
+    fetchurl = fetchurl;
+    fetchgit = fetchgit;
+    nix-gitignore = nix-gitignore;
+  }).nodeDependencies;
+in
 
 stdenv.mkDerivation rec {
   pname = "hours";
-  version = "1.0";
+  version = "0.0.0";
 
-  src = fetchurl {
-    url = "https://example.com/path/to/binary";
-    sha256 = "0000000000000000000000000000000000000000000000000000"; # You'll replace this
+  src = fetchFromGitHub {
+    owner = "hacke2man";
+    repo = "hours";
+    rev = "aa4bd276420b9d884d855904eae1f6e174f26562";
+    sha256 = "sha256-cx+ptIFmvtYNuRiJNAQX7Iv7Sm0vxGTrGuCLtn/SH34=";
   };
 
-  phases = [ "installPhase" ];
+  nativeBuildInputs = [ nodejs makeWrapper ];
+
+  configurePhase = ''
+    export HOME=$(mktemp -d)
+    ln -sf ${nodeDependencies}/lib/node_modules ./node_modules
+    export PATH="${nodeDependencies}/bin:$PATH"
+  '';
+
+  buildPhase = ''
+    npm install
+    npm run build
+  '';
 
   installPhase = ''
     mkdir -p $out/bin
-    cp $src $out/bin/my-binary
-    chmod +x $out/bin/my-binary
+    install -Dm755 dist/hours-linux $out/bin/hours
   '';
 
-  meta = with stdenv.lib; {
-    description = "timesheet summery/pdf creation";
-    homepage = "";
-    license = licenses.unfree;
-    platforms = platforms.all;
+  meta = with lib; {
+    description = "markdown hours summarizer/pdf maker";
+    homepage = "https://github.com/hacke2man/hours";
+    license = licenses.mit;
+    platforms = [ "x86_64-linux" ];
   };
 }
