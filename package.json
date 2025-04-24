@@ -1,0 +1,34 @@
+{
+  "name": "hours",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pkg . --out-path dist/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.8.1",
+  "dependencies": {
+    "pdfmake": "^0.2.18",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "scripts": [
+      "src/*.js"
+    ],
+    "assets": [
+      ".pnpm/**/*",
+      "node_modules/**/*",
+      "data/*"
+    ],
+    "targets": [
+      "node18-linux-x64",
+      "node18-macos-x64",
+      "node18-win-x64"
+    ]
+  }
+}
